@@ -1,0 +1,138 @@
+{
+  "site": {
+    "title": "Pharmesthetic Homecare | GIVEHADA",
+    "description": "Dược mỹ phẩm Hàn Quốc chính hãng cho chăm sóc da tại nhà. Chọn sản phẩm, để lại thông tin, chuyên viên GIVEHADA gọi xác nhận.",
+    "lang": "vi",
+    "themeColor": "#030417",
+    "appName": "Pharmesthetic Homecare",
+    "shortName": "Homecare"
+  },
+
+  "assets": {
+    "base": "https://framerusercontent.com",
+    "logo": { "path": "/images/whVXmkDm1eymg9kXg4btevD2kko.png", "w": 1920, "h": 848 },
+    "faviconDark": { "path": "/images/lLF676oz9oXnE5kxPuMMFdFaI.png" },
+    "faviconLight": { "path": "/images/lbSN4vUwfnYfYpyJoZsmjTPTU.png" }
+  },
+
+  "order": {
+    "endpoint": "",
+    "currency": "đ",
+    "maxQty": 20,
+    "hours": "thứ Hai đến thứ Sáu, 09:00 đến 18:00",
+    "zalo": "https://zalo.me/2619810007423081795",
+    "email": "givehada@h2yjsc.com",
+    "policy": "https://givehada.com/policy"
+  },
+
+  "hero": {
+    "welcome": "Welcome to",
+    "brand": "Pharmesthetic's",
+    "title": "Homecare House",
+    "tagline": "Skin, understood.",
+    "lead": "Dược mỹ phẩm Hàn Quốc chính hãng. Chọn đúng cho làn da của bạn, dùng đúng ngay tại nhà.",
+    "primary": "Chọn sản phẩm",
+    "secondary": "Cần tư vấn"
+  },
+
+  "manifesto": [
+    "Mỗi làn da mang một câu chuyện riêng. <em>Pharmesthetic</em> bắt đầu từ việc lắng nghe câu chuyện đó.",
+    "<strong>Hiểu. Chọn đúng. Dùng đủ.</strong>",
+    "Đó là cách chăm sóc da tại nhà theo chuẩn <em>chuyên gia</em>."
+  ],
+
+  "promise": [
+    { "title": "Chính hãng", "text": "Hàng chính hãng, phân phối bởi GIVEHADA." },
+    { "title": "Xác nhận từng đơn", "text": "Chuyên viên gọi xác nhận sản phẩm, phí giao và thanh toán trước khi giao." },
+    { "title": "Tư vấn đúng làn da", "text": "Chưa chắc nên chọn gì, đánh dấu cần tư vấn khi gửi đơn." }
+  ],
+
+  "sections": {
+    "signature": { "numeral": "I", "nav": "Chủ lực", "title": "The Signature", "sub": "Chủ lực", "quote": { "em": "Điểm khởi đầu", "rest": "chúng tôi đề xuất cho mọi làn da" } },
+    "collection": { "numeral": "II", "nav": "Sản phẩm", "title": "The Collection", "sub": "Theo bước chăm sóc", "quote": { "em": "Đúng sản phẩm, đúng bước,", "rest": "làn da sẽ đáp lại" } },
+    "rituals": { "numeral": "III", "nav": "Liệu trình", "title": "The Rituals", "sub": "Liệu trình gợi ý", "quote": { "em": "Sự kết hợp", "rest": "tạo nên khác biệt" } },
+    "order": { "numeral": "IV", "nav": "Đặt hàng", "title": "Your Order", "sub": "Đặt hàng", "quote": { "em": "Để lại thông tin.", "rest": "Chuyên viên GIVEHADA gọi xác nhận trong giờ làm việc" } }
+  },
+
+  "signature": [
+    {
+      "skus": ["VQM12"],
+      "kicker": "Bảo vệ và phục hồi",
+      "line": "Một lớp màng ẩm mỏng nhẹ. Che chắn làn da trước bụi mịn và hanh khô, củng cố hàng rào bảo vệ mỗi sáng và tối."
+    },
+    {
+      "skus": ["CON11", "CON10"],
+      "title": "Cemenzal Light Daily",
+      "variantLabels": { "CON11": "Film 1ml x 8", "CON10": "Hũ 100ml" },
+      "kicker": "Tái thiết cấu trúc",
+      "line": "Bước khóa cuối cùng của chu trình. Giữ cân bằng ẩm, bổ sung dưỡng chất, để làn da trông mịn và đàn hồi hơn."
+    },
+    {
+      "skus": ["COMBO-RITUAL-CASE"],
+      "kicker": "Foundation Free Combo",
+      "line": "Ba bước phục hồi và bảo vệ trong một hộp. Vibanqm Lotion, Finish Lotion, Final Balm, kèm khăn lụa Pharmesthetic."
+    }
+  ],
+
+  "rituals": [
+    {
+      "id": "nen-tang",
+      "name": "Nền tảng mỗi ngày",
+      "for": "Người mới bắt đầu, da khô hoặc nhạy cảm với thời tiết.",
+      "steps": [
+        { "time": "Sáng", "list": ["Gel Polishing làm sạch dịu nhẹ", "Gel Starter cân bằng màng ẩm", "Vibanqm Lotion khóa ẩm, che chắn"] },
+        { "time": "Tối", "list": ["Lotion Polishing tan lớp trang điểm", "Gel Polishing", "Gel Starter", "Vibanqm Lotion"] }
+      ],
+      "items": [{ "sku": "CON24", "qty": 1 }, { "sku": "VQM12", "qty": 1 }]
+    },
+    {
+      "id": "cong-huong",
+      "name": "Cộng hưởng Gel Starter và Cemenzal",
+      "for": "Làn da cần căng bóng, săn chắc hơn.",
+      "steps": [
+        { "time": "Các bước", "list": ["Gel Starter mở khóa màng ẩm", "Thoa Cemenzal khi da còn ẩm mướt", "Áp lòng bàn tay cho kem tan mịn", "Massage nhẹ toàn mặt để khóa dưỡng chất"] }
+      ],
+      "items": [{ "sku": "CON01", "qty": 1 }, { "sku": "CON11", "qty": 1 }]
+    },
+    {
+      "id": "phuc-hoi",
+      "name": "Phục hồi sau liệu trình",
+      "for": "Da nhạy cảm, da vừa peel, laser hoặc vi kim tại spa.",
+      "steps": [
+        { "time": "Các bước", "list": ["Vibanqm Lotion làm dịu, khóa ẩm", "Finish Lotion chống nắng", "Final Balm bảo vệ, nâng tông"] }
+      ],
+      "items": [{ "sku": "COMBO-RITUAL-CASE", "qty": 1 }]
+    }
+  ],
+
+  "form": {
+    "name": "Họ và tên",
+    "phone": "Số điện thoại",
+    "address": "Địa chỉ nhận hàng",
+    "note": "Ghi chú cho chuyên viên",
+    "notePlaceholder": "Loại da, khung giờ tiện nghe máy",
+    "consult": "Tôi cần tư vấn chọn sản phẩm phù hợp",
+    "consent": "Khi gửi đơn, bạn đồng ý để GIVEHADA dùng thông tin trên để liên hệ xác nhận và giao hàng.",
+    "feeNote": "Phí giao và cách thanh toán được chuyên viên báo khi gọi xác nhận.",
+    "submit": "Gửi đơn hàng",
+    "submitConsult": "Gửi yêu cầu tư vấn",
+    "empty": "Đơn hàng đang trống. Chọn sản phẩm phía trên, hoặc đánh dấu cần tư vấn."
+  },
+
+  "footer": {
+    "project": "PHARMESTHETIC HOMECARE",
+    "by": "Phân phối bởi GIVEHADA",
+    "company": "Công ty Cổ phần Thương mại và Đầu tư Quốc tế H2Y",
+    "address": "Lầu 3A, Tòa nhà L'MAK, 68 Phan Đăng Lưu, phường Đức Nhuận, Thành phố Hồ Chí Minh",
+    "registration": "Mã số doanh nghiệp: 2500630250",
+    "links": [
+      { "label": "Chính sách", "href": "https://givehada.com/policy" },
+      { "label": "givehada.com", "href": "https://givehada.com" }
+    ],
+    "social": [
+      { "name": "Facebook", "href": "https://www.facebook.com/pharmesthetic/" },
+      { "name": "Instagram", "href": "https://www.instagram.com/pharmestheticvn/" },
+      { "name": "Zalo", "href": "https://zalo.me/2619810007423081795" }
+    ]
+  }
+}
