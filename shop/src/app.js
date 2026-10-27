@@ -27,6 +27,27 @@
     bag: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
   };
 
+  /* ---------- ảnh không tải được: khung thay thế gọn gàng ---------- */
+  const markFailed = (img) => {
+    if (!img || img.dataset.failed) return;
+    img.dataset.failed = '1';
+    if (img.dataset.wordmark) {
+      const mark = document.createElement('span');
+      mark.className = img.dataset.wordmark;
+      mark.textContent = img.alt || 'GIVEHADA';
+      img.replaceWith(mark);
+      return;
+    }
+    const box = img.closest('[data-label]');
+    if (box) box.classList.add('media-fallback');
+  };
+  document.addEventListener('error', (e) => {
+    if (e.target && e.target.tagName === 'IMG') markFailed(e.target);
+  }, true);
+  document.querySelectorAll('img').forEach((img) => {
+    if (img.complete && img.naturalWidth === 0 && img.getAttribute('src')) markFailed(img);
+  });
+
   /* ---------- nguồn truy cập (quảng cáo, đường dẫn) ---------- */
   const SRC_KEY = 'ghshop.src';
   if (!sess.get(SRC_KEY)) {
@@ -187,10 +208,12 @@
     submitBtn.textContent = consultOnly ? submitBtn.dataset.labelConsult : submitBtn.dataset.label;
   };
 
+  const imgHtml = (im, { sizes, alt = '', lazy = true }) =>
+    `<img src="${esc(im.src)}"${im.srcset ? ` srcset="${esc(im.srcset)}" sizes="${sizes}"` : ''} width="${im.w}" height="${im.h}" alt="${esc(alt)}"${lazy ? ' loading="lazy"' : ''} decoding="async" referrerpolicy="no-referrer">`;
+
   const thumb = (sku) => {
     const im = (P[sku].images || [])[0];
-    if (!im) return '';
-    return `<img src="${esc(im.src)}"${im.srcset ? ` srcset="${esc(im.srcset)}" sizes="56px"` : ''} width="56" height="56" alt="" loading="lazy" decoding="async">`;
+    return `<span class="cart__thumb" data-label="">${im ? imgHtml(im, { sizes: '56px' }) : ''}</span>`;
   };
 
   const renderCart = () => {
@@ -269,13 +292,13 @@
     const p = P[sku];
     if (!p || !sheet) return;
     opener = from || null;
-    const imgs = (p.images || []).map((im, i) =>
-      `<img src="${esc(im.src)}"${im.srcset ? ` srcset="${esc(im.srcset)}" sizes="(min-width: 900px) 520px, 100vw"` : ''} width="${im.w}" height="${im.h}" alt="${esc(p.name)}${i ? `, ảnh ${i + 1}` : ''}" ${i ? 'loading="lazy"' : ''} decoding="async">`).join('');
+    const slides = (p.images || []).map((im, i) =>
+      `<figure class="pd__slide" data-label="${esc(p.name)}">${imgHtml(im, { sizes: '(min-width: 900px) 520px, 100vw', alt: `${p.name}${i ? `, ảnh ${i + 1}` : ''}`, lazy: i > 0 })}</figure>`).join('');
     const dots = p.images.length > 1
       ? `<div class="pd__dots">${p.images.map((_, i) => `<button type="button" data-dot="${i}" aria-label="Ảnh ${i + 1}"${i ? '' : ' class="is-on"'}></button>`).join('')}</div>`
       : '';
     sheetBody.innerHTML = `<article class="pd">
-      <div class="pd__gallery"><div class="pd__track" data-track>${imgs}</div>${dots}</div>
+      <div class="pd__gallery"><div class="pd__track" data-track>${slides}</div>${dots}</div>
       <div class="pd__info">
         <p class="pd__brand">${esc(p.brand)}</p>
         <h2 class="pd__name" id="sheet-title">${esc(p.name)}</h2>
@@ -499,9 +522,10 @@
       const d = new Date();
       const p2 = (n) => String(n).padStart(2, '0');
       const abc = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-      let r = '';
       const rnd = new Uint32Array(4);
-      (window.crypto || {}).getRandomValues ? window.crypto.getRandomValues(rnd) : rnd.forEach((_, i) => { rnd[i] = Math.random() * 1e9; });
+      if (window.crypto && window.crypto.getRandomValues) window.crypto.getRandomValues(rnd);
+      else rnd.forEach((_, i) => { rnd[i] = Math.floor(Math.random() * 1e9); });
+      let r = '';
       rnd.forEach((x) => { r += abc[x % abc.length]; });
       return `WEB${String(d.getFullYear()).slice(2)}${p2(d.getMonth() + 1)}${p2(d.getDate())}${r}`;
     };
@@ -525,8 +549,10 @@
       const items = Object.entries(cart).map(([sku, qty]) => ({ sku, name: P[sku].name, size: P[sku].size, qty, price: P[sku].price }));
       const orderId = makeId();
       const done = (id) => {
-        const who = esc(customer.name);
-        showStatus('ok', `<strong>Đã nhận ${items.length ? 'đơn' : 'yêu cầu'} ${esc(id)}.</strong>Cảm ơn ${who}. Chuyên viên GIVEHADA sẽ gọi số ${esc(customer.phone)} để xác nhận, trong giờ làm việc ${esc(DATA.hours)}.`);
+        const previewNote = DATA.preview
+          ? `<p class="form__preview">Bản xem trước: đơn chưa được gửi đi. Khi lên Vercel, đơn sẽ về Google Sheet và email ${esc(DATA.email)}.</p>`
+          : '';
+        showStatus('ok', `<strong>Đã nhận ${items.length ? 'đơn' : 'yêu cầu'} ${esc(id)}.</strong>Cảm ơn ${esc(customer.name)}. Chuyên viên GIVEHADA sẽ gọi số ${esc(customer.phone)} để xác nhận, trong giờ làm việc ${esc(DATA.hours)}.${previewNote}`);
         form.classList.add('is-done');
         cart = {};
         persist();
@@ -536,6 +562,7 @@
 
       // Ô ẩn chỉ máy dò điền: coi như đã gửi, không đẩy đi đâu.
       if (fields.website && fields.website.value) { done(orderId); return; }
+      if (DATA.preview) { done(orderId); return; }
       if (Date.now() - loadedAt < 2500) { showStatus('err', errorHtml('Thao tác quá nhanh, vui lòng thử lại sau vài giây.')); return; }
       if (!DATA.endpoint) { showStatus('err', errorHtml('Hệ thống nhận đơn đang được kết nối.')); return; }
 
@@ -557,7 +584,7 @@
       const ctrl = new AbortController();
       const timer = setTimeout(() => ctrl.abort(), 25000);
       try {
-        // text/plain để không phát sinh yêu cầu kiểm tra trước (preflight) với Google Apps Script
+        // Gửi dạng text/plain để không phát sinh yêu cầu kiểm tra trước (preflight) với Google Apps Script
         const res = await fetch(DATA.endpoint, { method: 'POST', body: JSON.stringify(payload), signal: ctrl.signal, redirect: 'follow' });
         const out = await res.json().catch(() => ({}));
         if (out && out.ok) done(out.orderId || orderId);

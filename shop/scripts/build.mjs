@@ -1,6 +1,7 @@
-// Build trang bán hàng Pharmesthetic Homecare: tải ảnh sản phẩm từ cdn.givehada.com,
-// nén sang WebP nhiều cỡ, dựng index.html tĩnh vào dist/.
-// Chạy trên Vercel mỗi lần deploy. Chạy thử ở máy: npm run build:offline (ảnh giả, không cần mạng).
+// Build trang bán hàng Pharmesthetic Homecare.
+// Vercel chạy `npm run build` mỗi lần deploy: tải ảnh sản phẩm từ cdn.givehada.com, nén WebP nhiều cỡ, dựng dist/.
+// Chạy thử ở máy: `npm run build:offline` (ảnh giả, không cần mạng).
+// Bản xem trước một file: `npm run build:single` (font, CSS, JS nhúng sẵn; ảnh lấy thẳng từ cdn.givehada.com).
 
 import { mkdir, readFile, writeFile, rm, copyFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
@@ -10,10 +11,11 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const DIST = path.join(ROOT, 'dist');
 const SRC = path.join(ROOT, 'src');
 const CACHE = path.join(ROOT, 'node_modules', '.cache', 'shop-assets');
 const OFFLINE = process.argv.includes('--offline') || process.env.SHOP_OFFLINE === '1';
+const SINGLE = process.argv.includes('--single');
+const DIST = path.join(ROOT, SINGLE ? 'dist-preview' : 'dist');
 
 const site = JSON.parse(await readFile(path.join(ROOT, 'content', 'site.json'), 'utf8'));
 const catalog = JSON.parse(await readFile(path.join(ROOT, 'content', 'products.json'), 'utf8'));
@@ -26,7 +28,7 @@ const esc = (s = '') => String(s)
 const rich = (s = '') => String(s);
 const money = (n) => `${Number(n).toLocaleString('vi-VN').replace(/,/g, '.')}${site.order.currency}`;
 
-const origin = (() => {
+const origin = SINGLE ? '' : (() => {
   const host = process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL || '';
   return host ? `https://${host}` : '';
 })();
@@ -65,6 +67,8 @@ async function fetchWithRetry(url, tries = 3) {
 }
 
 async function getSource(url) {
+  // Bản một file không kèm thư mục ảnh: dùng thẳng ảnh gốc.
+  if (SINGLE) return null;
   const cached = path.join(CACHE, url.replace(/^https?:\/\//, '').replace(/[^A-Za-z0-9._-]/g, '_'));
   if (existsSync(cached)) return readFile(cached);
   if (OFFLINE) return null;
@@ -100,7 +104,7 @@ async function buildImage(url, { widths, quality = 78, label = '', alpha = false
   if (!buf && OFFLINE) buf = await placeholder(w, h, label || id.slice(-8));
 
   if (!buf) {
-    // Không tải được: dùng thẳng ảnh gốc trên CDN để trang vẫn đủ ảnh.
+    // Không tải được, hoặc bản một file: dùng thẳng ảnh gốc trên CDN.
     return { src: url, srcset: '', w, h, remote: true };
   }
 
@@ -148,8 +152,8 @@ const FONTS = [
 ];
 const KEEP_SUBSETS = /-(latin|latin-ext|vietnamese)-\d/;
 
-async function buildFonts() {
-  await mkdir(path.join(DIST, 'fonts'), { recursive: true });
+async function buildFonts(inline = false) {
+  if (!inline) await mkdir(path.join(DIST, 'fonts'), { recursive: true });
   const blocks = [];
   const preload = [];
   for (const [pkg, variants] of FONTS) {
@@ -159,7 +163,13 @@ async function buildFonts() {
       for (const block of css.match(/@font-face\s*{[^}]*}/g) || []) {
         const woff2 = (block.match(/url\(\.\/files\/([^)]+\.woff2)\)/) || [])[1];
         if (!woff2 || !KEEP_SUBSETS.test(woff2)) continue;
-        await copyFile(path.join(dir, 'files', woff2), path.join(DIST, 'fonts', woff2));
+        const file = path.join(dir, 'files', woff2);
+        if (inline) {
+          const b64 = (await readFile(file)).toString('base64');
+          blocks.push(block.replace(/src:[^;]+;/, `src: url(data:font/woff2;base64,${b64}) format('woff2');`));
+          continue;
+        }
+        await copyFile(file, path.join(DIST, 'fonts', woff2));
         blocks.push(block.replace(/src:[^;]+;/, `src: url(/fonts/${woff2}) format('woff2');`));
         if (/be-vietnam-pro-latin-800-italic|noto-serif-display-latin-300-italic|be-vietnam-pro-vietnamese-400-normal/.test(woff2)) {
           preload.push(`/fonts/${woff2}`);
@@ -196,11 +206,10 @@ const icon = {
 const SIZES = {
   card: '(min-width: 1140px) 260px, (min-width: 720px) 30vw, 46vw',
   feature: '(min-width: 1140px) 540px, (min-width: 720px) 46vw, 100vw',
-  thumb: '64px',
 };
 
-const imgTag = (img, { sizes, alt = '', loading = 'lazy', cls = '' } = {}) =>
-  `<img${cls ? ` class="${cls}"` : ''} src="${esc(img.src)}"${img.srcset ? ` srcset="${esc(img.srcset)}" sizes="${sizes}"` : ''} width="${img.w}" height="${img.h}" alt="${esc(alt)}" loading="${loading}" decoding="async">`;
+const imgTag = (img, { sizes, alt = '', loading = 'lazy', cls = '', extra = '' } = {}) =>
+  `<img${cls ? ` class="${cls}"` : ''} src="${esc(img.src)}"${img.srcset ? ` srcset="${esc(img.srcset)}" sizes="${sizes}"` : ''} width="${img.w}" height="${img.h}" alt="${esc(alt)}" loading="${loading}" decoding="async"${img.remote ? ' referrerpolicy="no-referrer"' : ''}${extra}>`;
 
 /* ---------- dựng HTML ---------- */
 
@@ -239,7 +248,7 @@ function renderFeature(f, index, imgs) {
   const chips = (first.contents && first.contents.length ? first.contents : first.ingredients).slice(0, 6);
   return `
       <article class="feature${index % 2 ? ' feature--flip' : ''} reveal" data-feature="${first.sku}">
-        <button type="button" class="feature__media" data-open="${first.sku}" aria-label="Xem chi tiết ${esc(name)}">
+        <button type="button" class="feature__media" data-open="${first.sku}" data-label="${esc(name)}" aria-label="Xem chi tiết ${esc(name)}">
           ${imgTag(imgs[0], { sizes: SIZES.feature, loading: index === 0 ? 'eager' : 'lazy' })}
           <span class="feature__index">${String(index + 1).padStart(2, '0')}</span>
         </button>
@@ -265,7 +274,7 @@ function renderFeature(f, index, imgs) {
 function renderCard(p, img, i) {
   return `
         <li class="pcard" data-cat="${p.cat}" data-sku="${p.sku}" style="--i:${i % 8}">
-          <button type="button" class="pcard__media" data-open="${p.sku}" aria-label="Xem chi tiết ${esc(p.name)}">
+          <button type="button" class="pcard__media" data-open="${p.sku}" data-label="${esc(p.name)}" aria-label="Xem chi tiết ${esc(p.name)}">
             ${imgTag(img, { sizes: SIZES.card })}
           </button>
           <div class="pcard__body">
@@ -311,7 +320,7 @@ function renderPage({ css, js, fontPreload, logo, featureImgs, cardImgs, favicon
   const nav = navKeys.map((k) =>
     `<a href="#${ids[k]}" data-nav="${k}"><span>${S[k].numeral}</span>${esc(S[k].nav)}${k === 'order' ? '<b class="badge" data-count hidden>0</b>' : ''}</a>`).join('');
   const canonical = origin ? `${origin}/` : '';
-  const ogImage = og.startsWith('http') ? og : (origin ? `${origin}${og}` : og);
+  const ogImage = og ? (og.startsWith('http') ? og : (origin ? `${origin}${og}` : og)) : '';
   const f = site.footer;
   const F = site.form;
   const cats = catalog.categories.map((c) => ({ ...c, n: products.filter((p) => p.cat === c.id).length })).filter((c) => c.n);
@@ -320,40 +329,45 @@ function renderPage({ css, js, fontPreload, logo, featureImgs, cardImgs, favicon
   const gridOrder = products.map((p, i) => ({ p, i }))
     .sort((a, b) => catOrder.indexOf(a.p.cat) - catOrder.indexOf(b.p.cat) || a.i - b.i);
 
+  const topLogo = imgTag(logo, { sizes: '120px', alt: 'GIVEHADA', loading: 'eager', extra: ' data-wordmark="wordmark topbar__wordmark"' });
+  const heroLogo = imgTag(logo, { cls: 'hero__logo', sizes: '(min-width: 720px) 200px, 150px', alt: 'GIVEHADA', loading: 'eager', extra: ' fetchpriority="high" data-wordmark="wordmark hero__wordmark"' });
+
+  const head = [
+    `<meta charset="utf-8">`,
+    `<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">`,
+    `<title>${esc(title)}</title>`,
+    `<meta name="description" content="${esc(description)}">`,
+    `<meta name="theme-color" content="${themeColor}">`,
+    SINGLE ? `<meta name="robots" content="noindex">` : `<meta name="robots" content="index, follow, max-image-preview:large">`,
+    canonical && `<link rel="canonical" href="${canonical}">`,
+    `<meta property="og:type" content="website">`,
+    `<meta property="og:locale" content="vi_VN">`,
+    `<meta property="og:site_name" content="${esc(appName)}">`,
+    `<meta property="og:title" content="${esc(title)}">`,
+    `<meta property="og:description" content="${esc(description)}">`,
+    ogImage && `<meta property="og:image" content="${esc(ogImage)}">\n<meta property="og:image:width" content="1200">\n<meta property="og:image:height" content="630">`,
+    canonical && `<meta property="og:url" content="${canonical}">`,
+    `<meta name="twitter:card" content="summary_large_image">`,
+    `<meta name="twitter:title" content="${esc(title)}">`,
+    `<meta name="twitter:description" content="${esc(description)}">`,
+    ogImage && `<meta name="twitter:image" content="${esc(ogImage)}">`,
+    favicons.light && `<link rel="icon" href="${favicons.light}" media="(prefers-color-scheme: light)">`,
+    favicons.dark && `<link rel="icon" href="${favicons.dark}" media="(prefers-color-scheme: dark)">`,
+    favicons.touch && `<link rel="apple-touch-icon" href="${favicons.touch}">`,
+    ...fontPreload.map((h) => `<link rel="preload" href="${h}" as="font" type="font/woff2" crossorigin>`),
+    !SINGLE && `<link rel="manifest" href="/site.webmanifest">`,
+    `<meta name="mobile-web-app-capable" content="yes">`,
+    `<meta name="apple-mobile-web-app-title" content="${esc(site.site.shortName)}">`,
+    `<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">`,
+    `<meta name="format-detection" content="telephone=no">`,
+    css.inline ? `<style>\n${css.inline}\n</style>` : `<link rel="stylesheet" href="${css.href}">`,
+    `<script>document.documentElement.classList.add('js');window.__shopFallback=setTimeout(function(){document.documentElement.classList.remove('js')},4000)</script>`,
+  ].filter(Boolean).join('\n');
+
   return `<!doctype html>
 <html lang="${lang}">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>${esc(title)}</title>
-<meta name="description" content="${esc(description)}">
-<meta name="theme-color" content="${themeColor}">
-<meta name="robots" content="index, follow, max-image-preview:large">
-${canonical ? `<link rel="canonical" href="${canonical}">` : ''}
-<meta property="og:type" content="website">
-<meta property="og:locale" content="vi_VN">
-<meta property="og:site_name" content="${esc(appName)}">
-<meta property="og:title" content="${esc(title)}">
-<meta property="og:description" content="${esc(description)}">
-<meta property="og:image" content="${esc(ogImage)}">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-${canonical ? `<meta property="og:url" content="${canonical}">` : ''}
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="${esc(title)}">
-<meta name="twitter:description" content="${esc(description)}">
-<meta name="twitter:image" content="${esc(ogImage)}">
-${favicons.light ? `<link rel="icon" href="${favicons.light}" media="(prefers-color-scheme: light)">` : ''}
-${favicons.dark ? `<link rel="icon" href="${favicons.dark}" media="(prefers-color-scheme: dark)">` : ''}
-${favicons.touch ? `<link rel="apple-touch-icon" href="${favicons.touch}">` : ''}
-${fontPreload.map((h) => `<link rel="preload" href="${h}" as="font" type="font/woff2" crossorigin>`).join('\n')}
-<link rel="manifest" href="/site.webmanifest">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="${esc(site.site.shortName)}">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="format-detection" content="telephone=no">
-<link rel="stylesheet" href="${css}">
-<script>document.documentElement.classList.add('js');window.__shopFallback=setTimeout(function(){document.documentElement.classList.remove('js')},4000)</script>
+${head}
 </head>
 <body>
 <a class="skip" href="#san-pham">Đi thẳng tới sản phẩm</a>
@@ -363,7 +377,7 @@ ${fontPreload.map((h) => `<link rel="preload" href="${h}" as="font" type="font/w
 <header class="topbar" data-topbar>
   <div class="topbar__inner">
     <a class="topbar__logo" href="#top" aria-label="Về đầu trang">
-      <img src="${esc(logo.src)}"${logo.srcset ? ` srcset="${esc(logo.srcset)}" sizes="120px"` : ''} width="${logo.w}" height="${logo.h}" alt="GIVEHADA">
+      ${topLogo}
     </a>
     <nav class="topbar__nav" aria-label="Các phần của trang">${nav}</nav>
   </div>
@@ -373,7 +387,7 @@ ${fontPreload.map((h) => `<link rel="preload" href="${h}" as="font" type="font/w
   <section class="hero" data-hero>
     <div class="hero__halo" aria-hidden="true"></div>
     <div class="hero__inner">
-      <img class="hero__logo" src="${esc(logo.src)}"${logo.srcset ? ` srcset="${esc(logo.srcset)}" sizes="(min-width: 720px) 200px, 150px"` : ''} width="${logo.w}" height="${logo.h}" alt="GIVEHADA" fetchpriority="high">
+      ${heroLogo}
       <p class="hero__welcome">${esc(site.hero.welcome)} <em>${esc(site.hero.brand)}</em></p>
       <h1 class="hero__title">${esc(site.hero.title)}</h1>
       <p class="hero__tagline">${esc(site.hero.tagline)}</p>
@@ -495,7 +509,7 @@ ${fontPreload.map((h) => `<link rel="preload" href="${h}" as="font" type="font/w
 </div>
 
 <script id="shop-data" type="application/json">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>
-<script src="${js}" defer></script>
+${js.inline ? `<script>\n${js.inline}\n</script>` : `<script src="${js.href}" defer></script>`}
 </body>
 </html>
 `;
@@ -507,11 +521,13 @@ async function main() {
   const t0 = Date.now();
   await rm(DIST, { recursive: true, force: true });
   await mkdir(DIST, { recursive: true });
-  log(OFFLINE ? 'Chế độ offline: dùng ảnh giả' : 'Tải ảnh sản phẩm từ cdn.givehada.com');
-  if (!ORDER_ENDPOINT) warnings.push('Chưa có địa chỉ nhận đơn (order.endpoint). Form sẽ báo lỗi khi gửi.');
+  log(OFFLINE ? 'Chế độ offline: dùng ảnh giả'
+    : SINGLE ? 'Bản xem trước một file: ảnh lấy thẳng từ cdn.givehada.com'
+      : 'Tải ảnh sản phẩm từ cdn.givehada.com');
+  if (!ORDER_ENDPOINT && !SINGLE) warnings.push('Chưa có địa chỉ nhận đơn (order.endpoint). Form sẽ báo lỗi khi gửi.');
 
   const A = site.assets;
-  const fonts = await buildFonts();
+  const fonts = await buildFonts(SINGLE);
   const logo = await buildImage(A.base + A.logo.path, { ...A.logo, widths: [240, 400], quality: 90, alpha: true, label: 'GIVEHADA' });
 
   // Ảnh sản phẩm: ảnh đầu cho thẻ, đủ bộ cho trang chi tiết
@@ -523,48 +539,46 @@ async function main() {
   jobs.forEach((j, k) => { gallery[j.pi][j.ii] = built[k]; });
 
   const cardImgs = products.map((p, i) => gallery[i][0]);
-  const featureImgs = site.signature.map((f) => {
-    const i = products.findIndex((p) => p.sku === f.skus[0]);
-    return gallery[i];
-  });
+  const featureImgs = site.signature.map((f) => gallery[products.findIndex((p) => p.sku === f.skus[0])]);
 
-  // Favicon, biểu tượng màn hình chính
   const favicons = {};
-  for (const [key, a, file] of [['dark', A.faviconDark, 'favicon-dark.png'], ['light', A.faviconLight, 'favicon-light.png']]) {
-    const b = await getSource(A.base + a.path);
-    if (b) { await sharp(b).resize(64, 64, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toFile(path.join(DIST, file)); favicons[key] = `/${file}`; }
-  }
-  const manifestIcons = [];
-  {
-    const b = await getSource(A.base + A.faviconDark.path);
-    if (b) {
-      await sharp(b).resize(180, 180, { fit: 'contain', background: '#030417' }).png().toFile(path.join(DIST, 'apple-touch-icon.png'));
-      favicons.touch = '/apple-touch-icon.png';
-      for (const size of [192, 512]) {
-        const inner = Math.round(size * 0.6);
-        const mark = await sharp(b).resize(inner, inner, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toBuffer();
-        await sharp({ create: { width: size, height: size, channels: 4, background: '#030417' } })
-          .composite([{ input: mark, gravity: 'center' }]).png().toFile(path.join(DIST, `icon-${size}.png`));
-        manifestIcons.push({ src: `/icon-${size}.png`, sizes: `${size}x${size}`, type: 'image/png', purpose: 'any maskable' });
+  let og = '';
+  if (!SINGLE) {
+    // Favicon, biểu tượng màn hình chính
+    for (const [key, a, file] of [['dark', A.faviconDark, 'favicon-dark.png'], ['light', A.faviconLight, 'favicon-light.png']]) {
+      const b = await getSource(A.base + a.path);
+      if (b) { await sharp(b).resize(64, 64, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toFile(path.join(DIST, file)); favicons[key] = `/${file}`; }
+    }
+    const manifestIcons = [];
+    {
+      const b = await getSource(A.base + A.faviconDark.path);
+      if (b) {
+        await sharp(b).resize(180, 180, { fit: 'contain', background: '#030417' }).png().toFile(path.join(DIST, 'apple-touch-icon.png'));
+        favicons.touch = '/apple-touch-icon.png';
+        for (const size of [192, 512]) {
+          const inner = Math.round(size * 0.6);
+          const mark = await sharp(b).resize(inner, inner, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toBuffer();
+          await sharp({ create: { width: size, height: size, channels: 4, background: '#030417' } })
+            .composite([{ input: mark, gravity: 'center' }]).png().toFile(path.join(DIST, `icon-${size}.png`));
+          manifestIcons.push({ src: `/icon-${size}.png`, sizes: `${size}x${size}`, type: 'image/png', purpose: 'any maskable' });
+        }
       }
     }
-  }
-  await writeFile(path.join(DIST, 'site.webmanifest'), JSON.stringify({
-    name: site.site.appName,
-    short_name: site.site.shortName,
-    description: site.site.description,
-    lang: 'vi',
-    start_url: '/',
-    scope: '/',
-    display: 'standalone',
-    background_color: '#030417',
-    theme_color: '#030417',
-    icons: manifestIcons,
-  }, null, 2));
+    await writeFile(path.join(DIST, 'site.webmanifest'), JSON.stringify({
+      name: site.site.appName,
+      short_name: site.site.shortName,
+      description: site.site.description,
+      lang: 'vi',
+      start_url: '/',
+      scope: '/',
+      display: 'standalone',
+      background_color: '#030417',
+      theme_color: '#030417',
+      icons: manifestIcons,
+    }, null, 2));
 
-  // Ảnh chia sẻ 1200x630: nền đêm, ảnh sản phẩm chủ lực, logo
-  let og = '/og.jpg';
-  {
+    // Ảnh chia sẻ 1200x630: nền đêm, ảnh sản phẩm chủ lực, logo
+    og = '/og.jpg';
     const heroSku = site.signature[0].skus[0];
     const src = await getSource(IMG + bySku.get(heroSku).images[0]) || (OFFLINE ? await placeholder(1200, 1200, bySku.get(heroSku).name) : null);
     const logoBuf = await getSource(A.base + A.logo.path);
@@ -592,12 +606,13 @@ async function main() {
 
   // Dữ liệu cho script trên trang: chỉ những gì cần để tính đơn và hiện chi tiết
   const data = {
-    endpoint: ORDER_ENDPOINT,
+    endpoint: SINGLE ? '' : ORDER_ENDPOINT,
+    preview: SINGLE,
     currency: site.order.currency,
     maxQty: site.order.maxQty,
     hours: site.order.hours,
     zalo: site.order.zalo,
-    signature: site.signature.map((f) => f.skus),
+    email: site.order.email,
     products: Object.fromEntries(products.map((p, i) => [p.sku, {
       name: p.name, brand: p.brand, type: p.type, benefit: p.benefit, forWhom: p.forWhom, usage: p.usage,
       ingredients: p.ingredients, contents: p.contents || [], size: p.size, price: p.price,
@@ -605,20 +620,24 @@ async function main() {
     }])),
   };
 
-  // CSS, JS có hash để cache lâu dài
+  // CSS, JS: bản thường tách file có hash để cache lâu dài, bản một file nhúng thẳng vào HTML
   const cssText = `${fonts.css}\n${await readFile(path.join(SRC, 'styles.css'), 'utf8')}`;
-  const css = await writeHashed('site', 'css', cssText);
-  const js = await writeHashed('app', 'js', await readFile(path.join(SRC, 'app.js'), 'utf8'));
+  const jsText = await readFile(path.join(SRC, 'app.js'), 'utf8');
+  const css = SINGLE ? { inline: cssText } : { href: await writeHashed('site', 'css', cssText) };
+  const js = SINGLE ? { inline: jsText } : { href: await writeHashed('app', 'js', jsText) };
 
   const html = renderPage({ css, js, fontPreload: fonts.preload, logo, featureImgs, cardImgs, favicons, og, data });
   await writeFile(path.join(DIST, 'index.html'), html);
-  await writeFile(path.join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\n${origin ? `Sitemap: ${origin}/sitemap.xml\n` : ''}`);
-  if (origin) {
-    await writeFile(path.join(DIST, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${origin}/</loc></url></urlset>\n`);
+  if (!SINGLE) {
+    await writeFile(path.join(DIST, 'robots.txt'), `User-agent: *\nAllow: /\n${origin ? `Sitemap: ${origin}/sitemap.xml\n` : ''}`);
+    if (origin) {
+      await writeFile(path.join(DIST, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${origin}/</loc></url></urlset>\n`);
+    }
   }
 
   const remote = built.filter((b) => b.remote).length;
   log(`Xong trong ${((Date.now() - t0) / 1000).toFixed(1)}s. ${products.length} sản phẩm, ${built.length} ảnh, ${remote} ảnh dùng thẳng CDN gốc.`);
+  if (SINGLE) log(`Bản một file: ${path.join(DIST, 'index.html')} (${(Buffer.byteLength(html) / 1024).toFixed(0)} KB)`);
   if (warnings.length) {
     console.warn('[build] Cảnh báo:');
     for (const w of warnings.slice(0, 20)) console.warn('  ', w);

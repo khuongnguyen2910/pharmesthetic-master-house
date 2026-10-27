@@ -35,4 +35,5 @@ Mỗi đơn ghi một dòng vào tab **Đơn hàng**: thời gian, mã đơn, kh
 npm install
 npm run build:offline   # ảnh giả, không cần mạng
 npx serve dist
+npm run build:single    # một file dist-preview/index.html để gửi xem trước, ảnh lấy thẳng từ cdn.givehada.com
 ```

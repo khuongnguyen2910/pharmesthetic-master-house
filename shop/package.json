@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "build:offline": "node scripts/build.mjs --offline"
+    "build:offline": "node scripts/build.mjs --offline",
+    "build:single": "node scripts/build.mjs --single"
   },
   "engines": {
     "node": ">=20"
