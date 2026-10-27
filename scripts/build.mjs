@@ -37,16 +37,17 @@ const origin = (() => {
 async function fetchWithRetry(url, tries = 3) {
   let lastErr;
   for (let i = 0; i < tries; i++) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 90_000);
     try {
-      const ctrl = new AbortController();
-      const timer = setTimeout(() => ctrl.abort(), 90_000);
       const res = await fetch(url, { signal: ctrl.signal });
-      clearTimeout(timer);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return Buffer.from(await res.arrayBuffer());
     } catch (err) {
       lastErr = err;
-      await new Promise((r) => setTimeout(r, 1000 * (i + 1)));
+      if (i < tries - 1) await new Promise((r) => setTimeout(r, 1000 * (i + 1)));
+    } finally {
+      clearTimeout(timer);
     }
   }
   throw lastErr;
