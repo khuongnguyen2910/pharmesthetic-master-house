@@ -1,0 +1,143 @@
+{
+  "site": {
+    "title": "Pharmesthetic Việt Nam",
+    "description": "Tài liệu sử dụng sản phẩm và phác đồ điều trị chuẩn Pharmesthetic",
+    "lang": "vi",
+    "themeColor": "#030417"
+  },
+
+  "assets": {
+    "base": "https://framerusercontent.com",
+    "logo": { "path": "/images/whVXmkDm1eymg9kXg4btevD2kko.png", "w": 1920, "h": 848 },
+    "badge": { "path": "/images/UBGl9PJgms5hXkRIryNooK2gxA.webp", "w": 600, "h": 227 },
+    "heroVideo": { "path": "/assets/yDpzqiBFteFU7XilNSrcZg84KU.mp4" },
+    "heroPoster": { "path": "/images/qjAdArt2ETUh3Ds3U2uquOt3ck.jpg", "w": 1920, "h": 1080 },
+    "og": { "path": "/assets/YOGHZKWsvUihSi622OFblHYvsuc.png" },
+    "faviconDark": { "path": "/images/lLF676oz9oXnE5kxPuMMFdFaI.png" },
+    "faviconLight": { "path": "/images/lbSN4vUwfnYfYpyJoZsmjTPTU.png" }
+  },
+
+  "hero": {
+    "welcome": "Welcome to",
+    "brand": "Pharmesthetic's",
+    "title": "Master Aesthetic House",
+    "tagline": "Upgrade your mind. Upgrade your level"
+  },
+
+  "manifesto": [
+    "Tại đây, bạn có thể tìm thấy <em>“đẳng cấp tiếp theo”</em> của bản thân trên hành trình phát triển với tư cách Master.",
+    "<strong>Học hỏi. Trải nghiệm. Chia sẻ. Thành công</strong>",
+    "Đó là giá trị của một <em>Master Pharmesthetic</em>."
+  ],
+
+  "notice": "(*) Khi sử dụng tài liệu của chúng tôi, bạn đã đồng ý với chính sách bảo mật của GIVEHADA.",
+
+  "sessions": [
+    {
+      "id": "mastering",
+      "nav": "Mastering",
+      "numeral": "I",
+      "order": "First Session",
+      "key": "mastering",
+      "sub": "Giải mã",
+      "quote": { "em": "Câu chuyện về Làn da. Tâm lý. Xã hội", "rest": "trong hệ sinh thái của Pharmesthetic" },
+      "kind": "doc",
+      "shape": "landscape",
+      "cards": [
+        { "img": "/images/2743rbz5czzKCfMmRqxg9mfdnEM.png", "w": 2000, "h": 1414, "title": "Đào tạo thương hiệu", "text": "Tuyên ngôn “tinh thần làn da” từ Pharmesthetic", "href": "https://online.fliphtml5.com/GIVEHADA/jttx/" },
+        { "img": "/images/iqLBGRmcYYywMwUnIf5aoYdjr1c.png", "w": 2000, "h": 1414, "title": "Phiên hướng dẫn", "text": "Khám phá cốt lõi của vị trí Master", "href": "https://online.fliphtml5.com/GIVEHADA/cnbc/" }
+      ]
+    },
+    {
+      "id": "superjection",
+      "nav": "Superjection",
+      "numeral": "II",
+      "order": "Second Session",
+      "key": "superjection",
+      "sub": "Tiến hóa",
+      "quote": { "em": "Tư duy chuyên gia", "rest": "với điểm chạm công nghệ chuyên khoa chuẩn quốc tế" },
+      "kind": "doc",
+      "shape": "landscape",
+      "cards": [
+        { "img": "/images/SkoBHlHoVlZs8sxNrvf7Kyx84.png", "w": 2000, "h": 1414, "title": "Giới thiệu Superjection", "text": "Khi công nghệ gặp làn da", "href": "https://online.fliphtml5.com/GIVEHADA/ptwc/" },
+        { "img": "/images/sCrAnkZOSSZaFlaVGBHMvfQy6I.png", "w": 2000, "h": 1414, "title": "BLACK Exoroid", "text": "Tái tạo tế bào lão hóa", "href": "https://online.fliphtml5.com/GIVEHADA/gjnf/" },
+        { "img": "/images/K7aBtC5I4kIY8xMjmt9yEIQoO0.png", "w": 2000, "h": 1414, "title": "BLACK Retinaroid", "text": "Cải thiện nếp nhăn và đàn hồi da", "href": "https://online.fliphtml5.com/GIVEHADA/pxjp/" },
+        { "img": "/images/dJaEfrPYrlX6VdLjbMUvRhsQ8o.png", "w": 2000, "h": 1414, "title": "Activator & Active X", "text": "Hồi sinh làn da từ khác biệt", "href": "https://online.fliphtml5.com/GIVEHADA/ddpt/" },
+        { "img": "/images/ELh9L09eKyEtmd6rrZbV8kdWxR8.png", "w": 2000, "h": 1414, "title": "Superjection Applicator", "text": "Dụng cụ lăn vi kim chuyên dụng", "href": "https://online.fliphtml5.com/GIVEHADA/sxzr/" },
+        { "img": "/images/3WMDOko9AafwEOG2IcRvmvharM.png", "w": 2000, "h": 1414, "title": "Superjection Cream", "text": "Kem phục hồi làn da đa năng", "href": "https://online.fliphtml5.com/GIVEHADA/aohu/" },
+        { "img": "/images/WIIRUE46hxdtSYgmOdObfnEyITg.png", "w": 2000, "h": 1414, "title": "Post-Care Home Routine", "text": "Giai đoạn phục hồi tổn thương", "href": "https://online.fliphtml5.com/GIVEHADA/vkap/" }
+      ]
+    },
+    {
+      "id": "treatment",
+      "nav": "Treatment",
+      "numeral": "III",
+      "order": "Third Session",
+      "key": "treatment",
+      "part": "Part I",
+      "sub": "Cảm nhận",
+      "quote": { "em": "Kỷ nguyên mới", "rest": "bắt đầu với công cuộc tái sinh mạnh mẽ giá trị của làn da" },
+      "kind": "doc",
+      "shape": "landscape",
+      "tone": "dark",
+      "cards": [
+        { "img": "/images/a2X1f0yYcngSAFRQF0jo62nekBo.png", "w": 2000, "h": 1414, "title": "Superjection Sea Powder", "text": "Giải tỏa “nỗi lo” về mụn", "href": "https://online.fliphtml5.com/GIVEHADA/vjwk/" },
+        { "img": "/images/jas7XaJIdKG5LvvaN59p1YgFRqo.png", "w": 2000, "h": 1414, "title": "Superjection Sodium HA", "text": "Hồi sinh làn da", "href": "https://online.fliphtml5.com/GIVEHADA/chgd/" },
+        { "img": "/images/JaGQuReiMXHtYwxrWCFsSs6ziE.png", "w": 2000, "h": 1414, "title": "Superjection Exoroid", "text": "Phục hồi tế bào gốc", "href": "https://online.fliphtml5.com/GIVEHADA/vzot/" },
+        { "img": "/images/r6f8UXndGlxCmeakj4F3bM.png", "w": 2000, "h": 1414, "title": "Superjection Retinaroid", "text": "“Hạ nhiệt” tăng sắc tố da", "href": "https://online.fliphtml5.com/GIVEHADA/expa/" },
+        { "img": "/images/9uqUU6QqEBVDRuLYGlMXgmxfyA.png", "w": 2000, "h": 1414, "title": "Superjection Mixed I", "text": "Trẻ hóa “độ tuổi” làn da", "href": "https://online.fliphtml5.com/GIVEHADA/amkd/" },
+        { "img": "/images/w1xbe9XIMcV6NmJOYAwbI8vojLo.png", "w": 2000, "h": 1414, "title": "Superjection Mixed II", "text": "Phục hồi thương tổn sau mụn", "href": "https://online.fliphtml5.com/GIVEHADA/ckvi/" }
+      ]
+    },
+    {
+      "id": "trai-nghiem",
+      "nav": null,
+      "numeral": "III",
+      "order": "Third Session",
+      "key": "treatment",
+      "part": "Part II",
+      "sub": "Trải nghiệm",
+      "quote": { "em": "Quá trình hồi sinh làn da", "rest": "từ bàn tay của Master chuẩn Pharmesthetic" },
+      "kind": "video",
+      "shape": "wide",
+      "tone": "dark",
+      "cards": [
+        { "img": "/images/a4C5YeZRYrCJe2xkEZRhTm97N0.jpg", "w": 3840, "h": 2160, "title": "Superjection Sodium HA", "text": "Liệu trình căng bóng được thực hiện bởi Master Pharmesthetic", "href": "https://youtu.be/o8bnCFUdO-I", "video": "o8bnCFUdO-I" },
+        { "img": "/images/u0910WZJ6WOYmT1ipKVNJAGwCg.jpg", "w": 3840, "h": 2160, "title": "Superjection Sea Powder", "text": "Liệu trình điều trị da mụn được thực hiện bởi Master Pharmesthetic", "href": "https://youtu.be/I-LtoWzfyWY", "video": "I-LtoWzfyWY" },
+        { "img": "/images/EBJwCgYN5FKa3GZKmlfKtIogNS8.jpg", "w": 3840, "h": 2160, "title": "Superjection Exoroid", "text": "Liệu trình phục hồi tế bào được thực hiện bởi Master Pharmesthetic", "href": "https://youtu.be/wo75-HqpiN0", "video": "wo75-HqpiN0" },
+        { "img": "/images/opRQ6QEAlTOIuRoDVrMHfk0Kgc.jpg", "w": 3840, "h": 2160, "title": "Superjection Retinaroid", "text": "Liệu trình điều trị tăng sắc tố da được thực hiện bởi Master Pharmesthetic", "href": "https://youtu.be/-2M1bMz-f4o", "video": "-2M1bMz-f4o" }
+      ]
+    },
+    {
+      "id": "ecosystem",
+      "nav": "Ecosystem",
+      "numeral": "IV",
+      "order": "Fourth Session",
+      "key": "ecosystem",
+      "sub": "Hệ sinh thái",
+      "quote": { "em": "Toàn diện. Tối ưu. Hiệu quả", "rest": "là những mảnh ghép hoàn hảo tạo nên giải pháp" },
+      "kind": "doc",
+      "shape": "portrait",
+      "cards": [
+        { "img": "/images/yvKUeZm989LBzutd7RmolmVY.jpg", "w": 1414, "h": 2000, "title": "CONAPIDIL", "text": "Chăm sóc và phục hồi da", "href": "https://online.fliphtml5.com/GIVEHADA/klra/" },
+        { "img": "/images/jU9DC31RC8pcZVlbSj7BJioHx8.jpg", "w": 1414, "h": 2000, "title": "CONAPIDIL SUPERJECTION", "text": "Trị liệu làn da chuyên sâu", "href": "https://online.fliphtml5.com/GIVEHADA/gikq/" },
+        { "img": "/images/tv6oE3paVwtjE1SvFBWXRlatM.jpg", "w": 1414, "h": 2000, "title": "VIBANQUENTMANKA", "text": "Chăm sóc và phục hồi da", "href": "https://online.fliphtml5.com/GIVEHADA/mlbj/" },
+        { "img": "/images/UsUgwetiGSClobch0xZy16L0.jpg", "w": 1414, "h": 2000, "title": "AXENDA", "text": "Chăm sóc và phục hồi da", "href": "https://online.fliphtml5.com/GIVEHADA/qutr/" }
+      ]
+    }
+  ],
+
+  "footer": {
+    "more": "More updates in future…",
+    "project": "A GIVEHADA 2026 PROJECT®",
+    "company": "H2Y International Trading And Investment JSC",
+    "address": "Lầu 3A, Tòa nhà L'MAK, 68 Phan Đăng Lưu, phường Đức Nhuận, Thành phố Hồ Chí Minh, Việt Nam",
+    "registration": "Business Registration Number: 2500630250",
+    "badgeHref": "http://online.gov.vn/Home/WebDetails/117517",
+    "social": [
+      { "name": "Facebook", "href": "https://www.facebook.com/givehada" },
+      { "name": "Instagram", "href": "https://www.instagram.com/givehada/" },
+      { "name": "YouTube", "href": "https://www.youtube.com/@give-hada" }
+    ]
+  }
+}
