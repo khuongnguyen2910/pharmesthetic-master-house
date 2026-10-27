@@ -131,19 +131,31 @@
   }
 
   /* ---------- hiệu ứng xuất hiện ---------- */
-  const revealables = document.querySelectorAll('.reveal, .grid');
+  const pending = new Set(document.querySelectorAll('.reveal, .grid'));
+  const show = (el) => { el.classList.add('is-in'); pending.delete(el); };
   if ('IntersectionObserver' in window && !reduce.matches) {
     const io = new IntersectionObserver((entries) => {
       entries.forEach((e) => {
-        if (e.isIntersecting) {
-          e.target.classList.add('is-in');
-          io.unobserve(e.target);
-        }
+        if (e.isIntersecting) { show(e.target); io.unobserve(e.target); }
       });
     }, { rootMargin: '0px 0px -6% 0px' });
-    revealables.forEach((el) => io.observe(el));
+    pending.forEach((el) => io.observe(el));
+
+    // Dự phòng cho trình duyệt trong app (Zalo, Messenger) đôi khi báo trễ:
+    // phần nào đã nằm trong màn hình thì hiện luôn.
+    let ticking = false;
+    const sweep = () => {
+      ticking = false;
+      const limit = window.innerHeight * 1.02;
+      pending.forEach((el) => { if (el.getBoundingClientRect().top < limit) show(el); });
+      if (!pending.size) window.removeEventListener('scroll', onScroll);
+    };
+    const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(sweep); } };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('hashchange', () => setTimeout(sweep, 400));
+    setTimeout(sweep, 600);
   } else {
-    revealables.forEach((el) => el.classList.add('is-in'));
+    pending.forEach(show);
   }
 
   /* ---------- xem video trong trang ---------- */

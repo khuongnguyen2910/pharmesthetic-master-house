@@ -555,13 +555,12 @@ main { position: relative; z-index: 1; overflow-x: hidden; overflow-x: clip; }
 
 .card__play {
   position: absolute;
-  left: 50%;
-  top: 50%;
+  right: 10px;
+  bottom: 10px;
   display: grid;
   place-items: center;
-  width: 56px;
-  height: 56px;
-  transform: translate(-50%, -50%);
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   color: #fff;
   background: rgba(3, 4, 23, 0.42);
@@ -570,7 +569,11 @@ main { position: relative; z-index: 1; overflow-x: hidden; overflow-x: clip; }
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.4), 0 8px 30px rgba(0, 0, 0, 0.35);
   transition: transform 0.4s var(--ease), background 0.4s;
 }
-.card__play svg { width: 22px; height: 22px; margin-left: 3px; }
+.card__play svg { width: 18px; height: 18px; margin-left: 2px; }
+@media (min-width: 720px) {
+  .card__play { right: 14px; bottom: 14px; width: 52px; height: 52px; }
+  .card__play svg { width: 20px; height: 20px; }
+}
 
 .card__body {
   display: flex;
@@ -622,7 +625,7 @@ main { position: relative; z-index: 1; overflow-x: hidden; overflow-x: clip; }
       0 28px 60px -24px rgb(var(--blue) / 0.55);
   }
   .card__link:hover .card__media img { transform: scale(1.035); }
-  .card__link:hover .card__play { transform: translate(-50%, -50%) scale(1.08); background: rgba(3, 4, 23, 0.6); }
+  .card__link:hover .card__play { transform: scale(1.08); background: rgba(3, 4, 23, 0.6); }
   .card__link:hover .card__cta { color: #fff; }
   .card__link:hover .card__cta svg { transform: translateX(4px); }
 }
@@ -761,16 +764,16 @@ main { position: relative; z-index: 1; overflow-x: hidden; overflow-x: clip; }
 
 .js .reveal {
   opacity: 0;
-  transform: translateY(18px);
-  transition: opacity 1s var(--ease), transform 1s var(--ease);
+  transform: translateY(16px);
+  transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
 }
 .js .reveal.is-in { opacity: 1; transform: none; }
 
 .js .grid .card {
   opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 0.8s ease, transform 0.8s var(--ease);
-  transition-delay: calc(var(--i) * 70ms);
+  transform: translateY(14px);
+  transition: opacity 0.6s ease, transform 0.6s var(--ease);
+  transition-delay: calc(var(--i) * 50ms);
 }
 .js .grid.is-in .card { opacity: 1; transform: none; }
 
